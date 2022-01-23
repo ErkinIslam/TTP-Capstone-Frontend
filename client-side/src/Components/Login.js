@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 import './Login.css'
 
 class Login extends Component {
@@ -56,6 +57,7 @@ class Login extends Component {
       <li class="nav-item">
         <a class="nav-link" href="#">User Home</a>
       </li>
+      <Link class="btn btn-primary btn-lg" to="/Register" role="button">Register</Link>
     </ul>
   </div>
 </nav>
@@ -71,6 +73,7 @@ class Login extends Component {
             <input type="text" placeHolder = "  password" name="password" />
           </div>
           <button>Log In</button>
+
         </form>
       </div>
     )
