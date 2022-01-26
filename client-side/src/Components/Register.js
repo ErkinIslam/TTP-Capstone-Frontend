@@ -1,89 +1,81 @@
-import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom'
-import './Login.css'
+import React, { Fragment, useState } from "react";
+import { Link, Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 
-class Login extends Component {
-  constructor () {
-    super()
-    this.state = {
-      user: {
-        userName: '',
-        password: ''
-      },
-      redirect: false
+const Register = ({ setAuth }) => {
+  const [inputs, setInputs] = useState({
+    email: "",
+    password: "",
+    name: ""
+  });
+
+  const { email, password, name } = inputs;
+
+  const onChange = e =>
+    setInputs({ ...inputs, [e.target.name]: e.target.value });
+
+  const onSubmitForm = async e => {
+    e.preventDefault();
+    try {
+      const body = { email, password, name };
+      const response = await fetch(
+        "http://localhost:5000/authentication/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      const parseRes = await response.json();
+
+      if (parseRes.jwtToken) {
+        localStorage.setItem("token", parseRes.jwtToken);
+        setAuth(true);
+        toast.success("Register Successfully");
+      } else {
+        setAuth(false);
+        toast.error(parseRes);
+      }
+    } catch (err) {
+      console.error(err.message);
     }
-  }
+  };
 
-  handleSubmit = (e) => {
-    e.preventDefault()
-    this.props.LogIn(this.state.user)
-    this.setState({redirect: true})
-  }
-  
-  handleChange = (e) => {
-    const updatedUser = {...this.state.user}
-    const inputField = e.target.name
-    const inputValue = e.target.value
-    updatedUser[inputField] = inputValue
+  return (
+    <Fragment>
+      <h1 className="mt-5 text-center">Register</h1>
+      <form onSubmit={onSubmitForm}>
+        <input
+          type="text"
+          name="email"
+          value={email}
+          placeholder="email"
+          onChange={e => onChange(e)}
+          className="form-control my-3"
+        />
+        <input
+          type="password"
+          name="password"
+          value={password}
+          placeholder="password"
+          onChange={e => onChange(e)}
+          className="form-control my-3"
+        />
+        <input
+          type="text"
+          name="name"
+          value={name}
+          placeholder="name"
+          onChange={e => onChange(e)}
+          className="form-control my-3"
+        />
+        <button className="btn btn-success btn-block">Submit</button>
+      </form>
+      <Link to="/login">login</Link>
+    </Fragment>
+  );
+};
 
-    this.setState({user: updatedUser})
-  }
-
-
-  render () {
-    if (this.state.redirect) {
-      return (<Navigate to="/userProfile"/>)
-    }
-
-    return (
-        
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-          <nav class="navbar navbar-expand-lg navbar-dark ">
-  <a class="navbar-brand" href="#">Login</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Register</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">User Home</a>
-      </li>
-      <Link class="btn btn-primary btn-lg" to="/Login" role="button">Login</Link>
-      <Link class="btn btn-primary btn-lg" to="/Create" role="button">Create</Link>
-
-    </ul>
-  </div>
-</nav>
-          <h1>Burger HQ</h1>
-          <img src="https://dcassetcdn.com/design_img/2808265/132070/132070_15359255_2808265_834eb78a_image.jpg" alt="Burger HQ Logo"/>
-
-
-            <label htmlFor="userName">  </label>
-            <input type="text" placeHolder = "  Username" name="username" onChange={this.handleChange} value={this.state.user.userName} />
-          </div>
-          <div>
-            <label htmlFor="email"></label>
-            <input type="text" placeHolder = "  email" name="email" />
-          </div>
-          <div>
-            <label htmlFor="password"></label>
-            <input type="text" placeHolder = "  password" name="password" />
-          </div>
-          <button>Register</button>
-
-        </form>
-      </div>
-    )
-  }
-}
-
-export default Login 
+export default Register;

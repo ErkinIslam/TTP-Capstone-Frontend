@@ -1,17 +1,47 @@
-import React from 'react';
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-function Home() {
+const Dashboard = ({ setAuth }) => {
+  const [name, setName] = useState("");
 
-    return (
-        <div class="jumbotron">
-            <h1 class="display-4">Burger HQ!</h1>
-            <p class="lead">Create your own Specialty burgers!</p>
+  const getProfile = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/dashboard/", {
+        method: "POST",
+        headers: { jwt_token: localStorage.token }
+      });
 
-            <p>Choose from dozenes of choices of ingredients where you can freely mix and match however you want</p>
-            <Link class="btn btn-primary btn-lg" to="/Login" role="button">Get Started</Link>
-        </div>
-    )
-}
+      const parseData = await res.json();
+      setName(parseData.user_name);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
-export default Home;
+  const logout = async e => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("token");
+      setAuth(false);
+      toast.success("Logout successfully");
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  return (
+    <div>
+      <h1 className="mt-5">Dashboard</h1>
+      <h2>Welcome {name}</h2>
+      <button onClick={e => logout(e)} className="btn btn-primary">
+        Logout
+      </button>
+    </div>
+  );
+};
+
+export default Dashboard;
