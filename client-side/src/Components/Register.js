@@ -58,6 +58,8 @@ class Login extends Component {
         <a class="nav-link" href="#">User Home</a>
       </li>
       <Link class="btn btn-primary btn-lg" to="/Login" role="button">Login</Link>
+      <Link class="btn btn-primary btn-lg" to="/Create" role="button">Create</Link>
+
     </ul>
   </div>
 </nav>
